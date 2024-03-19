@@ -4,7 +4,7 @@ import { AdminServices } from "./admin.service";
 const getAdmins = async (req: Request, res: Response) => {
     
   try {
-    const result = await AdminServices.findAdminsfromDB(req.query);
+    const result = await AdminServices.getAdminsfromDB(req.query);
     res.status(200).send({
       success: true,
       message: "Admins retrieved successfully",
