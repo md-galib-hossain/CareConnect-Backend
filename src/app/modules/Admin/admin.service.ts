@@ -67,7 +67,7 @@ const getAdminsfromDB = async (
 };
 
 const getSingleAdminFromDB = async (id: string) : Promise<Admin | null> => {
-  const result = await prisma.admin.findUnique({
+  const result = await prisma.admin.findUniqueOrThrow({
     where: {
       id,
       isDeleted: false
