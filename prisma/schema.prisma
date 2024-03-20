@@ -19,6 +19,7 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   admin     Admin?
+  isDeleted     Boolean @default(false)
 
   @@map("users")
 }
@@ -48,4 +49,5 @@ enum UserRole {
 enum UserStatus {
   ACTIVE
   BLOCKED
+  DELETED
 }
