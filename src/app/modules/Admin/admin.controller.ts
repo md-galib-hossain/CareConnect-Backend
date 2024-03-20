@@ -2,13 +2,21 @@ import { Request, Response } from "express";
 import { AdminServices } from "./admin.service";
 import pick from "../../utils/pick";
 import { adminFilterableFields } from "./admin.constant";
+import sendResponse from "../../utils/sendResponse";
 
 const getAdmins = async (req: Request, res: Response) => {
   try {
     const filters = pick(req.query, adminFilterableFields);
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
     const result = await AdminServices.getAdminsfromDB(filters, options);
-    res.status(200).send({
+    // res.status(200).send({
+    //   success: true,
+    //   message: "Admins retrieved successfully",
+    //   meta: result?.meta,
+    //   data: result?.data,
+    // });
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Admins retrieved successfully",
       meta: result?.meta,
@@ -27,10 +35,11 @@ const getSingleAdmin = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const result = await AdminServices.getSingleAdminFromDB(id);
-    res.status(200).send({
+
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Admin retrieved successfully",
-
       data: result,
     });
   } catch (err: any) {
@@ -45,9 +54,11 @@ const getSingleAdmin = async (req: Request, res: Response) => {
 const updateSingleAdmin = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-   
-    const result = await AdminServices.updateAdminIntoDB(id,req.body);
-    res.status(200).send({
+
+    const result = await AdminServices.updateAdminIntoDB(id, req.body);
+
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Admin updated successfully",
 
@@ -64,11 +75,13 @@ const updateSingleAdmin = async (req: Request, res: Response) => {
 const deleteSingleAdmin = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-   
+
     const result = await AdminServices.deleteAdminFromDB(id);
-    res.status(200).send({
+
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
-      message: "Admin Deleted successfully",
+      message: "Admin deleted successfully",
 
       data: result,
     });
@@ -80,4 +93,9 @@ const deleteSingleAdmin = async (req: Request, res: Response) => {
     });
   }
 };
-export const AdminControllers = { getAdmins,getSingleAdmin,updateSingleAdmin,deleteSingleAdmin };
+export const AdminControllers = {
+  getAdmins,
+  getSingleAdmin,
+  updateSingleAdmin,
+  deleteSingleAdmin,
+};
