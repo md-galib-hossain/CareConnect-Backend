@@ -1,35 +1,42 @@
 import { Prisma, PrismaClient } from "@prisma/client";
+import { adminSearchableFields } from "./admin.constant";
+import { paginationHelpers } from "../../utils/paginationHelper";
+import prisma from "../../utils/prisma";
 
-const prisma = new PrismaClient();
-const getAdminsfromDB = async (query: Record<string, unknown>) => {
-const {searchTerm,...remainingQueries} = query
+
+
+
+const getAdminsfromDB = async (
+  query: Record<string, unknown>,
+  options: any
+) => {
+  const { page, limit, skip, sortBy, sortOrder } = paginationHelpers.calculatePagination(options);
+
+  const { searchTerm, ...remainingQueries } = query;
   const andConditions: Prisma.AdminWhereInput[] = [];
-  const adminSearchableFields = ['name', 'email']
   if (query.searchTerm) {
     andConditions.push({
-      OR: adminSearchableFields.map(field=> ({
-         [field]: {
-            contains: query.searchTerm as string,
-            mode: "insensitive",
-        }
-      }))
+      OR: adminSearchableFields.map((field) => ({
+        [field]: {
+          contains: query.searchTerm,
+          mode: "insensitive",
+        },
+      })),
     });
   }
 
-  if(Object.keys(remainingQueries).length > 0){
-
+  if (Object.keys(remainingQueries).length > 0) {
     andConditions.push({
-        AND : Object.keys(remainingQueries).map(key=>({
-            [key] : {
-                equals : remainingQueries[key]
-            }
-        }))
-    })
+      AND: Object.keys(remainingQueries).map((key) => ({
+        [key]: {
+          equals: remainingQueries[key],
+        },
+      })),
+    });
   }
   const whereConditions: Prisma.AdminWhereInput = {
     AND: andConditions,
   };
-
 
   const result = await prisma.admin.findMany({
     // where : {
@@ -39,10 +46,15 @@ const {searchTerm,...remainingQueries} = query
     //     }
     // }
     where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
   });
   return result;
 };
 
 export const AdminServices = {
-    getAdminsfromDB,
+  getAdminsfromDB,
 };
