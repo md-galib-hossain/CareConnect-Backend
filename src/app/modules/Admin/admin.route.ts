@@ -1,10 +1,34 @@
-import express from 'express'
-import { AdminControllers } from './admin.controller'
-const router = express.Router()
+import express, { NextFunction, Request, Response } from "express";
+import { AdminControllers } from "./admin.controller";
+import { AnyZodObject, z } from "zod";
+const router = express.Router();
 
-router.get('/',AdminControllers.getAdmins)
-router.get('/:id',AdminControllers.getSingleAdmin)
-router.patch('/:id',AdminControllers.updateSingleAdmin)
-router.delete('/:id',AdminControllers.deleteSingleAdmin)
+const update = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    contactNumber: z.string().optional(),
+  }),
+});
+const validateRequest = (schema: AnyZodObject) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await schema.parseAsync({
+        body: req.body,
+      });
+      return next();
+    } catch (err) {
+      next(err);
+    }
+  };
+};
 
-export const AdminRoutes = router
+router.get("/", AdminControllers.getAdmins);
+router.get("/:id", AdminControllers.getSingleAdmin);
+router.patch(
+  "/:id",
+  validateRequest(update),
+  AdminControllers.updateSingleAdmin
+);
+router.delete("/:id", AdminControllers.deleteSingleAdmin);
+
+export const AdminRoutes = router;

@@ -1,83 +1,62 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { AdminServices } from "./admin.service";
 import pick from "../../utils/pick";
 import { adminFilterableFields } from "./admin.constant";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
 
-const getAdmins = async (req: Request, res: Response, next : NextFunction) => {
-  try {
-    const filters = pick(req.query, adminFilterableFields);
-    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-    const result = await AdminServices.getAdminsfromDB(filters, options);
-    // res.status(200).send({
-    //   success: true,
-    //   message: "Admins retrieved successfully",
-    //   meta: result?.meta,
-    //   data: result?.data,
-    // });
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Admins retrieved successfully",
-      meta: result?.meta,
-      data: result?.data,
-    });
-  } catch (err: any) {
-   next(err)
-  }
-};
+const getAdmins: RequestHandler = catchAsync(async (req, res) => {
+  const filters = pick(req.query, adminFilterableFields);
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const result = await AdminServices.getAdminsfromDB(filters, options);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Admins retrieved successfully",
+    meta: result?.meta,
+    data: result?.data,
+  });
+});
 
-const getSingleAdmin = async (req: Request, res: Response, next : NextFunction) => {
-  try {
-    const { id } = req.params;
-    const result = await AdminServices.getSingleAdminFromDB(id);
+const getSingleAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await AdminServices.getSingleAdminFromDB(id);
 
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Admin retrieved successfully",
-      data: result,
-    });
-  } catch (err: any) {
-  next(err)
-  }
-};
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Admin retrieved successfully",
+    data: result,
+  });
+});
 
-const updateSingleAdmin = async (req: Request, res: Response, next : NextFunction) => {
-  try {
-    const { id } = req.params;
+const updateSingleAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-    const result = await AdminServices.updateAdminIntoDB(id, req.body);
+  const result = await AdminServices.updateAdminIntoDB(id, req.body);
 
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Admin updated successfully",
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Admin updated successfully",
 
-      data: result,
-    });
-  } catch (err: any) {
-   next(err)
-  }
-};
-const deleteSingleAdmin = async (req: Request, res: Response, next : NextFunction) => {
-  try {
-    const { id } = req.params;
+    data: result,
+  });
+});
+const deleteSingleAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-    const result = await AdminServices.deleteAdminFromDB(id);
+  const result = await AdminServices.deleteAdminFromDB(id);
 
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Admin deleted successfully",
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Admin deleted successfully",
 
-      data: result,
-    });
-  } catch (err: any) {
-   next(err)
-  }
-};
+    data: result,
+  });
+});
 export const AdminControllers = {
   getAdmins,
   getSingleAdmin,
