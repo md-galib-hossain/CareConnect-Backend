@@ -9,3 +9,10 @@ export type TSendResponse<T> = {
   };
   data: T | null | undefined;
 };
+
+export type TPaginationOptions = {
+  page ? : number;
+  limit ? : number;
+  sortBy? : string | undefined;
+  sortOrder?: string | undefined;
+}
