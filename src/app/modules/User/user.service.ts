@@ -1,10 +1,19 @@
-import { Prisma, PrismaClient, UserRole } from "@prisma/client";
+import {
+  Admin,
+  Doctor,
+  Patient,
+  Prisma,
+  PrismaClient,
+  UserRole,
+} from "@prisma/client";
 import bcrypt from "bcrypt";
 import prisma from "../../utils/prisma";
 import { fileUploader } from "../../utils/fileUploader";
-import { TFile } from "../../interface/interface";
+import { TFile, TPaginationOptions } from "../../interface/interface";
 import { Request } from "express";
-const createAdminIntoDB = async (req: Request) => {
+import { paginationHelpers } from "../../utils/paginationHelper";
+import { userSearchableFields } from "./user.constant";
+const createAdminIntoDB = async (req: Request): Promise<Admin> => {
   const file = req.file as TFile;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
@@ -30,7 +39,7 @@ const createAdminIntoDB = async (req: Request) => {
   return result;
 };
 
-const createDoctorIntoDB = async (req: Request) => {
+const createDoctorIntoDB = async (req: Request): Promise<Doctor> => {
   const file = req.file as TFile;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
@@ -55,7 +64,7 @@ const createDoctorIntoDB = async (req: Request) => {
 
   return result;
 };
-const createPatientIntoDB = async (req: Request) => {
+const createPatientIntoDB = async (req: Request): Promise<Patient> => {
   const file = req.file as TFile;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
@@ -80,8 +89,100 @@ const createPatientIntoDB = async (req: Request) => {
 
   return result;
 };
+
+const getUsersfromDB = async (query: any, options: TPaginationOptions) => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(options);
+
+  const { searchTerm, ...remainingQueries } = query;
+  const andConditions: Prisma.UserWhereInput[] = [];
+  if (query.searchTerm) {
+    andConditions.push({
+      OR: userSearchableFields.map((field) => ({
+        [field]: {
+          contains: query.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(remainingQueries).length > 0) {
+    andConditions.push({
+      AND: Object.keys(remainingQueries).map((key) => ({
+        [key]: {
+          equals: (remainingQueries as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.UserWhereInput =
+    andConditions.length > 0
+      ? {
+          AND: andConditions,
+        }
+      : {};
+
+  const result = await prisma.user.findMany({
+    // where : {
+    //     name :{
+    //         contains : query.searchTerm as string,
+    //         mode: 'insensitive'
+    //     }
+    // }
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      needsPasswordChange: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      admin: true,
+      patient: true,
+      doctor: true,
+    },
+    // include:{admin:true,patient:true,doctor:true}
+  });
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+const changeProfileStatus = async (id: string, status: UserRole) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+      where: {
+          id
+      }
+  });
+
+  const updateUserStatus = await prisma.user.update({
+      where: {
+          id
+      },
+      data: status
+  });
+
+  return updateUserStatus;
+}
 export const userService = {
   createAdminIntoDB,
   createDoctorIntoDB,
   createPatientIntoDB,
+  getUsersfromDB,changeProfileStatus
 };

@@ -32,4 +32,10 @@ req.body = userValidations.createPatient.parse(JSON.parse(req.body.data))
 return userController.createPatient(req,res,next)
 },
 );
+
+router.get(
+    "/",
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    userController.getUsers
+  );
 export const UserRoutes = router;
