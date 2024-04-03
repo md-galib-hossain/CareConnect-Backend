@@ -1,3 +1,5 @@
+import { UserRole, UserStatus } from "@prisma/client";
+
 export type TSendResponse<T> = {
   statusCode: number;
   success: boolean;
@@ -51,3 +53,10 @@ export type TFile = {
   path: string;
   size: number
 }
+export type TAuthUser = {
+  email : string;
+  role : UserRole ;
+  status : UserStatus
+  id: string;
+  isDeleted : boolean
+} | null

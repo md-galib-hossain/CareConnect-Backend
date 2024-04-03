@@ -10,7 +10,7 @@ import {
 import bcrypt from "bcrypt";
 import prisma from "../../utils/prisma";
 import { fileUploader } from "../../utils/fileUploader";
-import { TFile, TPaginationOptions } from "../../interface/interface";
+import { TAuthUser, TFile, TPaginationOptions } from "../../interface/interface";
 import { Request } from "express";
 import { paginationHelpers } from "../../utils/paginationHelper";
 import { userSearchableFields } from "./user.constant";
@@ -183,10 +183,10 @@ const changeProfileStatus = async (id: string, status: UserRole) => {
   return updateUserStatus;
 };
 
-const getMyProfileFromDB = async (user: any) => {
+const getMyProfileFromDB = async (user: TAuthUser) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
       status: UserStatus.ACTIVE,
     },
     select: {
@@ -226,10 +226,10 @@ const getMyProfileFromDB = async (user: any) => {
   return { ...userInfo, ...profileInfo };
 };
 
-const updateMyProfileIntoDB = async (user: any, req: Request) => {
+const updateMyProfileIntoDB = async (user: TAuthUser, req: Request) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
       status: UserStatus.ACTIVE,
     },
     select: {

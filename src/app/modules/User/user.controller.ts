@@ -5,6 +5,7 @@ import pick from "../../utils/pick";
 import { userFilterableFields } from "./user.constant";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { TAuthUser } from "../../interface/interface";
 
 const createAdmin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -60,8 +61,8 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getMyProfile = catchAsync(async (req : Request & {user? : any}, res : Response) => {
-  const result = await userService.getMyProfileFromDB(req?.user);
+const getMyProfile = catchAsync(async (req : Request & {user? : TAuthUser}, res : Response) => {
+  const result = await userService.getMyProfileFromDB(req?.user as TAuthUser);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -70,9 +71,9 @@ const getMyProfile = catchAsync(async (req : Request & {user? : any}, res : Resp
     data: result,
   });
 });
-const updateMyProfile = catchAsync(async (req : Request & {user? : any}, res : Response) => {
+const updateMyProfile = catchAsync(async (req : Request & {user? : TAuthUser}, res : Response) => {
   
-  const result = await userService.updateMyProfileIntoDB(req.user,req);
+  const result = await userService.updateMyProfileIntoDB(req.user as TAuthUser,req);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
