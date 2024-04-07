@@ -4,3 +4,7 @@ export type TSchedule= {
     startTime : string;
     endTime : string;
 }
+export type TFilterRequest = {
+    startDateTime?: string | undefined;
+    endDateTime?: string | undefined;
+}
