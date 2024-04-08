@@ -12,4 +12,20 @@ router.post(
     // validateRequest(DoctorScheduleValidation.create),
     DoctorScheduleController.createDoctorSchedule
 );
+router.get(
+    '/',
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+    DoctorScheduleController.getAllDoctorSchedule
+);
+router.get(
+    '/my-schedule',
+    auth(UserRole.DOCTOR),
+    DoctorScheduleController.getMySchedule
+)
+router.delete(
+    '/:id',
+    auth(UserRole.DOCTOR),
+    DoctorScheduleController.deleteDoctorSchedule
+);
+
 export const DoctorScheduleRoutes = router;
