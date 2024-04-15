@@ -8,7 +8,17 @@ const router = express.Router()
 router.post(
     '/',
     auth(UserRole.PATIENT),
-    // validateRequest(AppointmentValidation.createAppointment),
+    validateRequest(AppointmentValidation.createAppointment),
     AppointmentController.createAppointment
+);
+router.get(
+    '/my-appointment',
+    auth(UserRole.PATIENT,UserRole.DOCTOR),
+    AppointmentController.getMyAppointment
+);
+router.get(
+    '/',
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    AppointmentController.getAllAppointment
 );
 export const AppointmentRoutes = router

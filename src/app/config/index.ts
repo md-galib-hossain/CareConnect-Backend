@@ -18,4 +18,13 @@ export default {
     EMAIL: process.env.EMAIL,
     APP_PASSWORD: process.env.APP_PASSWORD,
   },
+  SSL:{
+    STORE_ID : process.env.STORE_ID,
+    STORE_PASSWORD : process.env.STORE_PASSWORD,
+    CANCEL_URL : process.env.CANCEL_URL,
+    FAIL_URL : process.env.FAIL_URL,
+    SSL_PAYMENT_URL : process.env.SSL_PAYMENT_URL,
+    SUCCESS_URL : process.env.SUCCESS_URL,
+    SSL_VALIDATION_URL : process.env.SSL_VALIDATION_URL
+  }
 };

@@ -35,7 +35,7 @@ const getMySchedule = async (
     const { startDate, endDate, ...filterData } = filters;
     console.log(filterData)
 
-    const andConditions = [];
+    const andConditions:Prisma.DoctorSchedulesWhereInput[] = [];
 
     if (startDate && endDate) {
         andConditions.push({
