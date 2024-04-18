@@ -2,8 +2,9 @@ import axios from "axios";
 import config from "../../config";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
+import {  TPaymentData } from "./ssl.interface";
 
-const initPyament = async (paymentData: any) => {
+const initPyament = async (paymentData: TPaymentData) => {
   const payload = {
     store_id: config.SSL.STORE_ID as string,
     store_passwd: config.SSL.STORE_PASSWORD as string,
@@ -18,15 +19,15 @@ const initPyament = async (paymentData: any) => {
     product_name: "Computer.",
     product_category: "Service",
     product_profile: "general",
-    cus_name: paymentData.appointment.patient.name,
-    cus_email: paymentData.appointment.patient.email,
-    cus_add1: paymentData.appointment.patient.address,
+    cus_name: paymentData.name,
+    cus_email: paymentData.email,
+    cus_add1: paymentData.address,
     cus_add2: "N/A",
     cus_city: "Dhaka",
     cus_state: "Dhaka",
     cus_postcode: "1000",
     cus_country: "Bangladesh",
-    cus_phone: paymentData.appointment.patient.contactNumber,
+    cus_phone: paymentData.phoneNumber,
     cus_fax: "01711111111",
     ship_name: "N/A",
     ship_add1: "N/A",

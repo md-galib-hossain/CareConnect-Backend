@@ -21,4 +21,9 @@ router.get(
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
     AppointmentController.getAllAppointment
 );
+router.patch(
+    '/status/:appointmentId',
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN,UserRole.DOCTOR),
+    AppointmentController.changeAppointmentStatus
+);
 export const AppointmentRoutes = router
