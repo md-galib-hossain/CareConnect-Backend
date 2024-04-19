@@ -78,6 +78,12 @@ const getMySchedule = async (
             }),
         });
     }
+    //*fetching only schedules whith same email from jwt
+    andConditions.push({
+        doctor : {
+            email : user?.email
+        } 
+    })
 
     const whereConditions: Prisma.DoctorSchedulesWhereInput =
         andConditions.length > 0 ? { AND: andConditions } : {};
