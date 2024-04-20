@@ -10,7 +10,7 @@ const createPrescriptionIntoDB = async (
   user: TAuthUser
 ) => {
   const appointmentData = await prisma.appointment.findUniqueOrThrow({
-    where: {
+    where: { 
       id: payload.appointmentId,
       status: AppointmentStatus.COMPLETED,
       paymentStatus: PaymentStatus.PAID,
