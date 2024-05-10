@@ -12,7 +12,7 @@ CREATE TABLE "doctors" (
     "registrationNumber" TEXT NOT NULL,
     "experience" INTEGER NOT NULL DEFAULT 0,
     "gender" "Gender" NOT NULL,
-    "appoinmentFee" INTEGER NOT NULL,
+    "appointmentFee" INTEGER NOT NULL,
     "qualification" TEXT NOT NULL,
     "currentWorkingPlace" TEXT NOT NULL,
     "designation" TEXT NOT NULL,

@@ -72,7 +72,7 @@ const createAppointmentIntoDB = async (user: TAuthUser, payload: any) => {
     await tx.payment.create({
       data: {
         appointmentId: appointmentData?.id,
-        amount: doctorData?.appoinmentFee,
+        amount: doctorData?.appointmentFee,
         transactionId: transactionId,
       },
     });

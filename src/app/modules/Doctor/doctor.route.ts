@@ -8,7 +8,7 @@ router.get("/", DoctorController.getAllDoctors);
 router.get("/:id", DoctorController.getDoctorById);
 router.patch("/:id", DoctorController.updateDoctor);
 router.delete(
-  "/:id",
+  "/soft/:id",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   DoctorController.deleteDoctor
 );

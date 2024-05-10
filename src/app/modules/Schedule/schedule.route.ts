@@ -15,7 +15,7 @@ router.get(
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR),
   ScheduleController.getScheduleById
 );
-router.get("/", auth(UserRole.DOCTOR), ScheduleController.getAllSchedule);
+router.get("/", auth(UserRole.DOCTOR,UserRole.SUPER_ADMIN, UserRole.ADMIN), ScheduleController.getAllSchedule);
 router.delete(
   "/:id",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),

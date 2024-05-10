@@ -38,8 +38,8 @@ const createDoctor = z.object({
     }),
     experience : z.number().optional(),
     gender :z.enum([Gender.MALE,Gender.FEMALE]),
-    appoinmentFee: z.number({
-      required_error: "appoinmentFee required",
+    appointmentFee: z.number({
+      required_error: "appointmentFee required",
     }),
     qualification : z.string({
       required_error: "qualification required",

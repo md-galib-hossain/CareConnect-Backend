@@ -10,7 +10,6 @@ const createSpecialties = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Specialties created successfully",
-
     data: result,
   });
 });
