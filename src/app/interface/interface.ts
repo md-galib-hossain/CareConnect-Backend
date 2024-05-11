@@ -60,3 +60,12 @@ export type TAuthUser = {
   id: string;
   isDeleted : boolean
 } | null
+
+export type TGenericResponse<T> = {
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+  data: T;
+};
