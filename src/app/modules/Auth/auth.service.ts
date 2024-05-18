@@ -49,7 +49,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
     needPasswordChange: userData?.needsPasswordChange,
   };
 };
-
+//refresh token start
 const refreshToken = async (token: string) => {
   let decodedData;
   try {
@@ -83,6 +83,7 @@ const refreshToken = async (token: string) => {
     needPasswordChange: userData?.needsPasswordChange,
   };
 };
+//refresh token end
 const changePasswordIntoDB = async (user: any, payload: any) => {
   const userData = await prisma.user.findFirstOrThrow({
     where: {

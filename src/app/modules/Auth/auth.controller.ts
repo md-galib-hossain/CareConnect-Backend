@@ -23,7 +23,10 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 });
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies;
+  console.log(refreshToken)
   const result = await AuthServices.refreshToken(refreshToken);
+  
+  //set refresh token into cookie again
   // const { refreshToken } = result;
   // res.cookie("refreshToken", refreshToken, {
   //   secure: false,
