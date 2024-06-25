@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { SpecialtiesService } from "./specialties.service";
+import pick from "../../utils/pick";
 
 const createSpecialties = catchAsync(async (req, res) => {
   const result = await SpecialtiesService.createSpecialtiesIntoDB(req);
@@ -15,7 +16,10 @@ const createSpecialties = catchAsync(async (req, res) => {
 });
 
 const getAllSpecialties = catchAsync(async (req: Request, res: Response) => {
-    const result = await SpecialtiesService.getAllSpecialtiesFromDB();
+  const filters = pick(req.query, ['searchTerm']);
+  
+    const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder'])
+    const result = await SpecialtiesService.getAllSpecialtiesFromDB(filters, options);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

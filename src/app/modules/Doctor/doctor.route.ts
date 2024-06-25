@@ -5,6 +5,7 @@ import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 router.get("/", DoctorController.getAllDoctors);
+router.get("/statistics/:id", DoctorController.getDoctorStatistics);
 router.get("/:id", DoctorController.getDoctorById);
 router.patch("/:id", DoctorController.updateDoctor);
 router.delete(

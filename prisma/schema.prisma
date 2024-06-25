@@ -49,7 +49,7 @@ model Doctor {
   registrationNumber  String
   experience          Int                 @default(0)
   gender              Gender
-  appointmentFee       Int
+  appointmentFee      Int
   qualification       String
   currentWorkingPlace String
   designation         String
@@ -156,7 +156,6 @@ model Schedule {
 
   @@map("schedules")
 }
-
 model DoctorSchedules {
   doctorId String
   doctor   Doctor @relation(fields: [doctorId], references: [id])
@@ -168,6 +167,8 @@ model DoctorSchedules {
 
   appointmentId String?      @unique
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   @@id([doctorId, scheduleId])
   @@map("doctor_schedules")
@@ -245,7 +246,7 @@ model Review {
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
 
   rating    Float
-  comment   String
+  comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

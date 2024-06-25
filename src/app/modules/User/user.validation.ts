@@ -50,6 +50,7 @@ const createDoctor = z.object({
     designation:  z.string({
       required_error: "designation required",
     }),
+   
   }),
 })
 const createPatient = z.object({

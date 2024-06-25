@@ -93,6 +93,7 @@ const getAllDoctorsFromDB = async (
 };
 
 const getDoctorByIdFromDB = async (id: string): Promise<Doctor | null> => {
+  console.log(id);
   const result = await prisma.doctor.findUnique({
     where: {
       id,
@@ -104,8 +105,11 @@ const getDoctorByIdFromDB = async (id: string): Promise<Doctor | null> => {
           specialties: true,
         },
       },
+      doctorSchedules: true,
+      review: true,
     },
   });
+  console.log(result);
   return result;
 };
 
@@ -197,9 +201,136 @@ const deleteDoctorFromDB = async (id: string): Promise<Doctor> => {
   });
 };
 
+
+const getDoctorStatistics = async (doctorId: string, filter: { startDate?: Date; endDate?: Date }) => {
+  const { startDate, endDate } = filter;
+
+  // Common date filter for all queries
+  const dateFilter = {
+    createdAt: {
+      gte: startDate,
+      lte: endDate,
+    },
+  };
+
+  // Appointment counts grouped by status
+  const appointmentCountsByStatus = await prisma.appointment.groupBy({
+    by: ["status"],
+    where: {
+      doctorId,
+      ...dateFilter,
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  // Doctor schedules count by month
+  const doctorSchedulesByMonth = await prisma.doctorSchedules.groupBy({
+    by: ["createdAt"],
+    where: {
+      doctorId,
+      createdAt: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  // Process the doctorSchedulesByMonth to group by month
+  const schedulesByMonth = doctorSchedulesByMonth.reduce((acc, item) => {
+    const month = new Date(item.createdAt).getMonth() + 1; // Get month (1-12)
+    acc[month] = (acc[month] || 0) + item._count._all;
+    return acc;
+  }, {} as { [key: number]: number });
+
+  // Unique patients count for lifetime
+  const uniquePatientsCount = await prisma.appointment.findMany({
+    where: {
+      doctorId,
+    },
+    distinct: ['patientId'],
+    select: {
+      patientId: true,
+    },
+  });
+
+  // Unique patients count by blood group
+  const patientCountByBloodGroup = await prisma.patientHealthData.groupBy({
+    by: ["bloodGroup"],
+    _count: {
+      _all: true,
+    },
+  });
+
+  // Unique patients count by marital status
+  const patientCountByMaritalStatus = await prisma.patientHealthData.groupBy({
+    by: ["maritalStatus"],
+    _count: {
+      _all: true,
+    },
+  });
+
+  // Unique patients count by gender
+  const patientCountByGender = await prisma.patientHealthData.groupBy({
+    by: ["gender"],
+    _count: {
+      _all: true,
+    },
+  });
+
+  // Payment counts grouped by status
+  const paymentCountsByStatus = await prisma.payment.groupBy({
+    by: ["status"],
+    where: {
+      appointment: {
+        doctorId,
+        createdAt: dateFilter.createdAt,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  // Review counts grouped by rating
+  const reviewCountsByRating = await prisma.review.groupBy({
+    by: ["rating"],
+    where: {
+      doctorId,
+      ...dateFilter,
+    },
+    _count: {
+      _all: true,
+    },
+  });
+
+  // Group reviews by rating categories
+  const reviewCountsByCategory = {
+    "1-2": reviewCountsByRating.filter(r => r.rating <= 2).reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
+    "3": reviewCountsByRating.filter(r => r.rating === 3).reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
+    "4-5": reviewCountsByRating.filter(r => r.rating >= 4).reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
+  };
+
+  return {
+    appointmentCountsByStatus,
+    doctorSchedulesByMonth: schedulesByMonth,
+    uniquePatientsCount,
+    patientCountByBloodGroup,
+    patientCountByMaritalStatus,
+    patientCountByGender,
+    paymentCountsByStatus,
+    reviewCountsByCategory,
+  };
+};
+
+
 export const DoctorService = {
   getDoctorByIdFromDB,
   getAllDoctorsFromDB,
   updateDoctorIntoDB,
-  deleteDoctorFromDB,
+  deleteDoctorFromDB,getDoctorStatistics
 };

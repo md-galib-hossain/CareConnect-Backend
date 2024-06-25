@@ -54,4 +54,23 @@ const deleteDoctor = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export const DoctorController= {getDoctorById,getAllDoctors,updateDoctor,deleteDoctor}
+const getDoctorStatistics = catchAsync(async (req: Request, res: Response) => {
+    const { id: doctorId } = req.params;
+    const { startDate, endDate } = req.query;
+  
+    const filter = {
+      startDate: startDate ? new Date(startDate as string) : undefined,
+      endDate: endDate ? new Date(endDate as string) : undefined,
+    };
+  
+    const result = await DoctorService.getDoctorStatistics(doctorId, filter);
+  
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Doctor statistics retrieved successfully',
+      data: result,
+    });
+  });
+
+export const DoctorController= {getDoctorById,getAllDoctors,updateDoctor,deleteDoctor,getDoctorStatistics}

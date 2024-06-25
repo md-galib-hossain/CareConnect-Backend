@@ -12,7 +12,7 @@ router.post(
     AppointmentController.createAppointment
 );
 router.get(
-    '/my-appointment',
+    '/my-appointments',
     auth(UserRole.PATIENT,UserRole.DOCTOR),
     AppointmentController.getMyAppointment
 );

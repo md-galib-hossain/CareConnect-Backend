@@ -7,6 +7,7 @@ import config from "../../config";
 import emailSender from "../../utils/emailsender";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
+import { jwtHelpers } from "../../utils/jwtHelpers";
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
@@ -116,73 +117,62 @@ const changePasswordIntoDB = async (user: any, payload: any) => {
   };
 };
 
-const forgotPassword = async (payload: { email: string }) => {
-  const userData = await prisma.user.findUniqueOrThrow({
+const forgotPassword = async (payload: any) => {
+  const isUserExist = await prisma.user.findUnique({
     where: {
-      email: payload?.email,
-      status: UserStatus.ACTIVE,
-    },
+      email : payload?.email,
+      status: UserStatus.ACTIVE
+    }
   });
-  const resetPassToken = generateToken(
-    { email: userData.email, role: userData.role },
-    config.JWT.RESET_PASSWORD_TOKEN as Secret,
-    config.JWT.RESET_PASSWORD_TOKEN_EXPIRES_IN as string
-  );
-  console.log(resetPassToken);
-  const resetPassLink =
-    config.JWT.RESET_PASSWORD_LINK +
-    `?id=${userData?.id}&token=${resetPassToken}`;
-  //http://localhost:5000/reset-pass
-  console.log(resetPassLink);
-  await emailSender(
-    userData?.email,
-    `
-    <div>
-      <p> Dear User,</p>
-      <p> Your Password reset link 
-      <a href=${resetPassLink}>
-<button>Reset Password</button>
-      </a>
-      </p>
-    </div>
-    `
-  );
-};
-const resetPassword = async (
-  token: string,
-  payload: { id: string; password: string }
-) => {
-  const userData = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: payload?.id,
-      status: UserStatus.ACTIVE,
-    },
-  });
-  const isValidToken = verifyToken(
-    token,
-    config.JWT.RESET_PASSWORD_TOKEN as string
-  );
-  console.log(isValidToken);
-  if (!isValidToken) {
-    throw new AppError(httpStatus.FORBIDDEN, "invalid token");
+  if (!isUserExist) {
+      throw new AppError(httpStatus.BAD_REQUEST, "User does not exist!")
   }
 
-  const hashedPassword: string = await bcrypt.hash(payload?.password, 10);
+  const passResetToken = await jwtHelpers.createPasswordResetToken({
+      id: isUserExist.id
+  });
+
+  const resetLink: string = config.JWT.RESET_PASSWORD_LINK + `?id=${isUserExist.id}&token=${passResetToken}`
+  console.log({resetLink})
+
+  await emailSender(payload?.email, `
+    <div>
+      <p>Dear ${isUserExist.role},</p>
+      <p>Your password reset link: <a href=${resetLink}><button>RESET PASSWORD<button/></a></p>
+      <p>Thank you</p>
+    </div>
+`);
+}
+const resetPassword = async (payload: { id: string, newPassword: string }, token: string) => {
+
+  const isUserExist = await prisma.user.findUnique({
+      where: {
+          id: payload.id,
+          status: UserStatus.ACTIVE
+      }
+  })
+
+  if (!isUserExist) {
+      throw new AppError(httpStatus.BAD_REQUEST, "User not found!")
+  }
+
+  const isVarified = jwtHelpers.verifyToken(token, config.JWT.RESET_PASSWORD_TOKEN as string);
+
+  if (!isVarified) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "Something went wrong!")
+  }
+
+  const password = await bcrypt.hash(payload.newPassword, 10);
 
   await prisma.user.update({
-    where: {
-      email: userData.email,
-    },
-    data: {
-      password: hashedPassword,
-      needsPasswordChange: false,
-    },
-  });
-  return  {
-    message: "Password recovered successfully",
-  }
- 
-};
+      where: {
+          id: payload.id
+      },
+      data: {
+          password
+      }
+  })
+}
 
 export const AuthServices = {
   loginUser,

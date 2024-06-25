@@ -126,7 +126,7 @@ const getMyAppointmentFromDB = async (
         : { createdAt: "desc" },
     include:
       user?.role === UserRole.PATIENT
-        ? { doctor: true, schedule: true }
+        ? { doctor: true, schedule: true,review : true }
         : {
             patient: {
               include: { medicalReport: true, patientHealthData: true },
