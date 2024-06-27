@@ -215,6 +215,13 @@ const getMyProfileFromDB = async (user: TAuthUser) => {
       where: {
         email: userInfo.email,
       },
+      include : {
+        doctorSpecialties : {
+          include : {
+            specialties : true
+          }
+        }
+      }
     });
   } else if (userInfo?.role === UserRole.PATIENT) {
     profileInfo = await prisma.patient.findUniqueOrThrow({

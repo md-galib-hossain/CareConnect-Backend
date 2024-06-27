@@ -11,7 +11,6 @@ const createAppointmentIntoDB = async (user: TAuthUser, payload: any) => {
       email: user?.email,
     },
   });
-  console.log(payload);
 
   const doctorData = await prisma.doctor.findUniqueOrThrow({
     where: {
@@ -87,7 +86,6 @@ const getMyAppointmentFromDB = async (
   filters: any,
   options: TPaginationOptions
 ) => {
-  console.log(user, filters, options);
   const { limit, page, skip } = paginationHelpers.calculatePagination(options);
   const { ...filterData } = filters;
   const andConditions: Prisma.AppointmentWhereInput[] = [];
@@ -199,8 +197,21 @@ const getAllAppointmentFromDB = async (
             createdAt: "desc",
           },
     include: {
-      doctor: true,
+      doctor: {
+        include : {
+          doctorSpecialties : {
+            include : {
+              specialties : true
+            }
+          }
+        }
+      },
       patient: true,
+      doctorSchedules : {
+        include: {
+          schedule: true,
+        },
+      }
     },
   });
   const total = await prisma.appointment.count({

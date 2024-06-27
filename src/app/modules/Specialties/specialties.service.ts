@@ -3,7 +3,10 @@ import { fileUploader } from "../../utils/fileUploader";
 import prisma from "../../utils/prisma";
 import { Prisma, Specialties } from "@prisma/client";
 import { TFilterRequest } from "../Schedule/schedule.interface";
-import { TGenericResponse, TPaginationOptions } from "../../interface/interface";
+import {
+  TGenericResponse,
+  TPaginationOptions,
+} from "../../interface/interface";
 import { paginationHelpers } from "../../utils/paginationHelper";
 import { specialtiesSearchableFields } from "./specialties.constant";
 
@@ -42,6 +45,7 @@ const getAllSpecialtiesFromDB = async (
   const result = await prisma.specialties.findMany({
     where: {
       ...whereConditions,
+      isDeleted: false,
     },
     skip,
     take: limit,
@@ -51,11 +55,10 @@ const getAllSpecialtiesFromDB = async (
         : { title: "asc" },
   });
   const total = await prisma.specialties.count({
-    where : {
+    where: {
       ...whereConditions,
-    
-    }
-  })
+    },
+  });
   return {
     meta: {
       total,
@@ -66,9 +69,12 @@ const getAllSpecialtiesFromDB = async (
   };
 };
 const deleteSpecialtiesFromDB = async (id: string): Promise<Specialties> => {
-  const result = await prisma.specialties.delete({
+  const result = await prisma.specialties.update({
     where: {
       id,
+    },
+    data: {
+      isDeleted: true,
     },
   });
   return result;

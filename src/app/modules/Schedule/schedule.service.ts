@@ -183,7 +183,6 @@ const getAllScheduleFromDB = async (
 ): Promise<TGenericResponse<Schedule[]>> => {
   const { limit, page, skip } = paginationHelpers.calculatePagination(options);
   const { startDateTime, endDateTime, ...filterData } = filters; // Extracting startDate and endDate from filters
-console.log(startDateTime)
   const andConditions = [];
 
   // Adding date filtering conditions if startDate and endDate are provided

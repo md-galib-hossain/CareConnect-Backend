@@ -93,7 +93,6 @@ const getAllDoctorsFromDB = async (
 };
 
 const getDoctorByIdFromDB = async (id: string): Promise<Doctor | null> => {
-  console.log(id);
   const result = await prisma.doctor.findUnique({
     where: {
       id,
@@ -109,75 +108,95 @@ const getDoctorByIdFromDB = async (id: string): Promise<Doctor | null> => {
       review: true,
     },
   });
-  console.log(result);
   return result;
 };
 
 const updateDoctorIntoDB = async (id: string, payload: any) => {
   const { specialties, ...doctorData } = payload;
-  await prisma.$transaction(async (transactionClient) => {
-    const result = await transactionClient.doctor.update({
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const updatedDoctor = await transactionClient.doctor.update({
       where: {
         id,
       },
       data: doctorData,
     });
-    console.log(doctorData);
-    if (!result) {
-      throw new AppError(httpStatus.BAD_REQUEST, "Unable to update Doctor");
+
+    if (!updatedDoctor) {
+      throw new Error("Unable to update Doctor");
     }
+
     if (specialties && specialties.length > 0) {
       const deleteSpecialities = specialties.filter(
         (speciality: any) => speciality.specialtiesId && speciality.isDeleted
       );
 
+      const previousSpecialties = await transactionClient.doctorSpecialties.findMany({
+        where: {
+          doctorId: id,
+        },
+      });
+
+      if (previousSpecialties) {
+        const missingIds = previousSpecialties
+          .filter((prevSpec) =>
+            !specialties.some((someSpec: any) => someSpec.specialtiesId === prevSpec.specialtiesId)
+          )
+          .map((prevSpec) => ({
+            specialtiesId: prevSpec.specialtiesId,
+            isDeleted: true,
+          }));
+
+        if (missingIds.length > 0) {
+          deleteSpecialities.push(...missingIds);
+        }
+      }
+
       const newSpecialities = specialties.filter(
         (speciality: any) => speciality.specialtiesId && !speciality.isDeleted
       );
 
-      await asyncForEach(
-        deleteSpecialities,
-        async (deleteDoctorSpeciality: TSpecialties) => {
-          await transactionClient.doctorSpecialties.deleteMany({
-            where: {
-              AND: [
-                {
-                  doctorId: id,
-                },
-                {
-                  specialtiesId: deleteDoctorSpeciality.specialtiesId,
-                },
-              ],
-            },
-          });
-        }
-      );
-      await asyncForEach(
-        newSpecialities,
-        async (insertDoctorSpeciality: TSpecialties) => {
-          //@ needed for already added specialties
-          const existingSpecialties = await prisma.doctorSpecialties.findFirst({
-            where: {
-              specialtiesId: insertDoctorSpeciality.specialtiesId,
-              doctorId: id,
-            },
-          });
-
-          if (!existingSpecialties) {
-            await transactionClient.doctorSpecialties.create({
-              data: {
+      await asyncForEach(deleteSpecialities, async (deleteDoctorSpeciality: TSpecialties) => {
+        await transactionClient.doctorSpecialties.deleteMany({
+          where: {
+            AND: [
+              {
                 doctorId: id,
-                specialtiesId: insertDoctorSpeciality.specialtiesId,
               },
-            });
-          }
+              {
+                specialtiesId: deleteDoctorSpeciality.specialtiesId,
+              },
+            ],
+          },
+        });
+      });
+
+      await asyncForEach(newSpecialities, async (insertDoctorSpeciality: TSpecialties) => {
+        const existingSpecialties = await prisma.doctorSpecialties.findFirst({
+          where: {
+            specialtiesId: insertDoctorSpeciality.specialtiesId,
+            doctorId: id,
+          },
+        });
+
+        if (!existingSpecialties) {
+          await transactionClient.doctorSpecialties.create({
+            data: {
+              doctorId: id,
+              specialtiesId: insertDoctorSpeciality.specialtiesId,
+            },
+          });
         }
-      );
+      });
     }
 
-    return result;
+    return updatedDoctor;
   });
+
+  console.log(result); // Ensure result is logged for debugging
+  return result; // Return result from transaction
 };
+
 
 const deleteDoctorFromDB = async (id: string): Promise<Doctor> => {
   return await prisma.$transaction(async (transactionClient) => {
@@ -201,8 +220,10 @@ const deleteDoctorFromDB = async (id: string): Promise<Doctor> => {
   });
 };
 
-
-const getDoctorStatistics = async (doctorId: string, filter: { startDate?: Date; endDate?: Date }) => {
+const getDoctorStatistics = async (
+  doctorId: string,
+  filter: { startDate?: Date; endDate?: Date }
+) => {
   const { startDate, endDate } = filter;
 
   // Common date filter for all queries
@@ -252,7 +273,7 @@ const getDoctorStatistics = async (doctorId: string, filter: { startDate?: Date;
     where: {
       doctorId,
     },
-    distinct: ['patientId'],
+    distinct: ["patientId"],
     select: {
       patientId: true,
     },
@@ -310,9 +331,15 @@ const getDoctorStatistics = async (doctorId: string, filter: { startDate?: Date;
 
   // Group reviews by rating categories
   const reviewCountsByCategory = {
-    "1-2": reviewCountsByRating.filter(r => r.rating <= 2).reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
-    "3": reviewCountsByRating.filter(r => r.rating === 3).reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
-    "4-5": reviewCountsByRating.filter(r => r.rating >= 4).reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
+    "1-2": reviewCountsByRating
+      .filter((r) => r.rating <= 2)
+      .reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
+    "3": reviewCountsByRating
+      .filter((r) => r.rating === 3)
+      .reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
+    "4-5": reviewCountsByRating
+      .filter((r) => r.rating >= 4)
+      .reduce((sum, r) => sum + (r._count?._all ?? 0), 0),
   };
 
   return {
@@ -327,10 +354,10 @@ const getDoctorStatistics = async (doctorId: string, filter: { startDate?: Date;
   };
 };
 
-
 export const DoctorService = {
   getDoctorByIdFromDB,
   getAllDoctorsFromDB,
   updateDoctorIntoDB,
-  deleteDoctorFromDB,getDoctorStatistics
+  deleteDoctorFromDB,
+  getDoctorStatistics,
 };

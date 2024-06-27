@@ -88,7 +88,6 @@ const getByPatientIdFromDB = async (id: string): Promise<Patient | null> => {
 
 const updatePatientIntoDB = async (id: string, payload: Partial<TPatientUpdate>) : Promise<Patient | null> => {
   const { patientHealthData, medicalReport, ...patientData } = payload;
-  console.log(patientHealthData, medicalReport, patientData);
   const patientInfo = await prisma.patient.findUniqueOrThrow({
     where: {
       id,

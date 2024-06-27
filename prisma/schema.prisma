@@ -91,6 +91,7 @@ model Specialties {
   id                String              @id @unique @default(uuid())
   title             String
   icon              String
+  isDeleted         Boolean             @default(false)
   doctorSpecialties DoctorSpecialties[]
 
   @@map("specialties")
@@ -156,6 +157,7 @@ model Schedule {
 
   @@map("schedules")
 }
+
 model DoctorSchedules {
   doctorId String
   doctor   Doctor @relation(fields: [doctorId], references: [id])

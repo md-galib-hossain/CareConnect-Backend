@@ -17,7 +17,6 @@ const createReviewIntoDB = async (payload: any, user: TAuthUser) => {
       patientId: patientData?.id,
     },
   });
-  console.log(appointmentData);
   if (!(patientData.id === appointmentData.patientId)) {
     throw new AppError(httpStatus.BAD_REQUEST, "This is not your appointment");
   }
