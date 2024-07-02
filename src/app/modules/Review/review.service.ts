@@ -89,7 +89,15 @@ const getAllReviewsFromDB = async (
     include: {
       doctor: true,
       patient: true,
-      //appointment: true,
+      appointment: {
+        include : {
+          doctorSchedules : {
+            include : {
+              schedule : true
+            }
+          }
+        }
+      },
     },
   });
   const total = await prisma.review.count({
