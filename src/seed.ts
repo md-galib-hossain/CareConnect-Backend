@@ -1,5 +1,5 @@
 import { error } from "console";
-import prisma from "../src/app/utils/prisma";
+import prisma from "./app/utils/prisma";
 import { UserRole } from "@prisma/client";
 import bcrypt from 'bcrypt'
 const seedSuperAdmin = async () => {
