@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+    "postinstall": "prisma generate",
     "seed": "ts-node-dev --respawn --transpile-only src/seed.ts"
   },
   "keywords": [],

@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_1 = __importDefault(require("./app/utils/prisma"));
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const prisma_1 = __importDefault(require("./app/utils/prisma"));
 const seedSuperAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const isExistSuperAdmin = yield prisma_1.default.user.findFirst({

@@ -12,7 +12,7 @@ const globalErrorHandler_1 = __importDefault(require("./app/middlewares/globalEr
 const appointment_service_1 = require("./app/modules/Appointment/appointment.service");
 const node_cron_1 = __importDefault(require("node-cron"));
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true }));
+app.use((0, cors_1.default)({ origin: ["https://careconnect-frontend.vercel.app", "http://localhost:3000"], credentials: true }));
 app.use((0, cookie_parser_1.default)());
 //parser
 app.use(express_1.default.json());

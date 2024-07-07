@@ -126,6 +126,7 @@ const getAllDoctorScheduleFromDB = async (
     const { searchTerm, startDateTime, endDateTime, ...filterData } = filters;
     const andConditions = [];
   
+    console.log(filters)
     if (searchTerm) {
       andConditions.push({
         doctor: {

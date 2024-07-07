@@ -14,7 +14,7 @@ const initPyament = async (paymentData: TPaymentData) => {
     success_url: config.SSL.SUCCESS_URL,
     fail_url: config.SSL.FAIL_URL,
     cancel_url: config.SSL.CANCEL_URL,
-    ipn_url: "http://localhost:3030/ipn",
+    ipn_url: "https://careconnect-frontend.vercel.app/ipn",
     shipping_method: "N/A",
     product_name: "Computer.",
     product_category: "Service",

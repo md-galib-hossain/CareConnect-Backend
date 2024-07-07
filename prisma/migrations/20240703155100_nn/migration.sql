@@ -91,6 +91,7 @@ CREATE TABLE "specialties" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "icon" TEXT NOT NULL,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "specialties_pkey" PRIMARY KEY ("id")
 );

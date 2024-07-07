@@ -44,62 +44,62 @@ const createAdminIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* (
         role: client_1.UserRole.ADMIN,
     };
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
-        var _d;
+        var _a;
         const createdUserData = yield transactionClient.user.create({
             data: userData,
         });
         const createdAdminData = yield transactionClient.admin.create({
-            data: (_d = req === null || req === void 0 ? void 0 : req.body) === null || _d === void 0 ? void 0 : _d.admin,
+            data: (_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.admin,
         });
         return createdAdminData;
     }));
     return result;
 });
 const createDoctorIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e, _f, _g;
+    var _a, _b, _c;
     const file = req.file;
     if (file) {
         const uploadToCloudinary = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
         req.body.doctor.profilePhoto = uploadToCloudinary === null || uploadToCloudinary === void 0 ? void 0 : uploadToCloudinary.secure_url;
     }
-    const hashedPassword = yield bcrypt_1.default.hash((_e = req === null || req === void 0 ? void 0 : req.body) === null || _e === void 0 ? void 0 : _e.password, 10);
+    const hashedPassword = yield bcrypt_1.default.hash((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.password, 10);
     const userData = {
-        email: (_g = (_f = req === null || req === void 0 ? void 0 : req.body) === null || _f === void 0 ? void 0 : _f.doctor) === null || _g === void 0 ? void 0 : _g.email,
+        email: (_c = (_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.doctor) === null || _c === void 0 ? void 0 : _c.email,
         password: hashedPassword,
         role: client_1.UserRole.DOCTOR,
     };
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
-        var _h;
+        var _a;
         const createdUserData = yield transactionClient.user.create({
             data: userData,
         });
         const createdDoctorData = yield transactionClient.doctor.create({
-            data: (_h = req === null || req === void 0 ? void 0 : req.body) === null || _h === void 0 ? void 0 : _h.doctor,
+            data: (_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.doctor,
         });
         return createdDoctorData;
     }));
     return result;
 });
 const createPatientIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    var _j, _k, _l;
+    var _a, _b, _c;
     const file = req.file;
     if (file) {
         const uploadToCloudinary = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
         req.body.patient.profilePhoto = uploadToCloudinary === null || uploadToCloudinary === void 0 ? void 0 : uploadToCloudinary.secure_url;
     }
-    const hashedPassword = yield bcrypt_1.default.hash((_j = req === null || req === void 0 ? void 0 : req.body) === null || _j === void 0 ? void 0 : _j.password, 10);
+    const hashedPassword = yield bcrypt_1.default.hash((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.password, 10);
     const userData = {
-        email: (_l = (_k = req === null || req === void 0 ? void 0 : req.body) === null || _k === void 0 ? void 0 : _k.patient) === null || _l === void 0 ? void 0 : _l.email,
+        email: (_c = (_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.patient) === null || _c === void 0 ? void 0 : _c.email,
         password: hashedPassword,
         role: client_1.UserRole.PATIENT,
     };
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
-        var _m;
+        var _a;
         const createdUserData = yield transactionClient.user.create({
             data: userData,
         });
         const createdPatientData = yield transactionClient.patient.create({
-            data: (_m = req === null || req === void 0 ? void 0 : req.body) === null || _m === void 0 ? void 0 : _m.patient,
+            data: (_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.patient,
         });
         return createdPatientData;
     }));

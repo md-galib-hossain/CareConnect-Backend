@@ -1,7 +1,7 @@
 import { error } from "console";
-import prisma from "./app/utils/prisma";
 import { UserRole } from "@prisma/client";
 import bcrypt from 'bcrypt'
+import prisma from "./app/utils/prisma";
 const seedSuperAdmin = async () => {
   try {
     const isExistSuperAdmin = await prisma.user.findFirst({

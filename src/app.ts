@@ -10,7 +10,7 @@ import { AppointmentService } from "./app/modules/Appointment/appointment.servic
 import cron from "node-cron";
 const app: Application = express();
 
-app.use(cors({origin : "http://localhost:3000", credentials : true}));
+app.use(cors({origin : ["https://careconnect-frontend.vercel.app","http://localhost:3000"], credentials : true}));
 app.use(cookieParser());
 //parser
 app.use(express.json());

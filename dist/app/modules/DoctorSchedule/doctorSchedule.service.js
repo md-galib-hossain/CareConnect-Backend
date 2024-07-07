@@ -120,6 +120,7 @@ const getAllDoctorScheduleFromDB = (filters, options) => __awaiter(void 0, void 
     const { limit, page, skip } = paginationHelper_1.paginationHelpers.calculatePagination(options);
     const { searchTerm, startDateTime, endDateTime } = filters, filterData = __rest(filters, ["searchTerm", "startDateTime", "endDateTime"]);
     const andConditions = [];
+    console.log(filters);
     if (searchTerm) {
         andConditions.push({
             doctor: {

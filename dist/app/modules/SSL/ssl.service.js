@@ -27,7 +27,7 @@ const initPyament = (paymentData) => __awaiter(void 0, void 0, void 0, function*
         success_url: config_1.default.SSL.SUCCESS_URL,
         fail_url: config_1.default.SSL.FAIL_URL,
         cancel_url: config_1.default.SSL.CANCEL_URL,
-        ipn_url: "http://localhost:3030/ipn",
+        ipn_url: "https://careconnect-frontend.vercel.app/ipn",
         shipping_method: "N/A",
         product_name: "Computer.",
         product_category: "Service",
