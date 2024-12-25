@@ -72,12 +72,11 @@ const getMyProfile = catchAsync(async (req : Request & {user? : TAuthUser}, res 
   });
 });
 const updateMyProfile = catchAsync(async (req : Request & {user? : TAuthUser}, res : Response) => {
-  
   const result = await userService.updateMyProfileIntoDB(req.user as TAuthUser,req);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "My Profile uddated",
+    message: "My Profile updated",
 
     data: result,
   });

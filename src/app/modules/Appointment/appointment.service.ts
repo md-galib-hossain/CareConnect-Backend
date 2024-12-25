@@ -257,51 +257,55 @@ const changeAppointmentStatusIntoDB = async (
   return result
 };
 
-const cancelUnpaidAppointments = async ()=>{
-const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000)
-//getting appointments which are older than 30 mins
-const UnpaidAppointments = await prisma.appointment.findMany({
-  where:{
-    createdAt:{
-      lte: 
-        thirtyMinAgo
+const cancelUnpaidAppointments = async () => {
+  try {
+      const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
+      const UnpaidAppointments = await prisma.appointment.findMany({
+          where: {
+              createdAt: { lte: thirtyMinAgo },
+              paymentStatus: PaymentStatus.UNPAID,
+          },
+      });
+console.log(UnpaidAppointments)
       
-    },
-    paymentStatus : PaymentStatus.UNPAID
-  }
-})
-//getting the unpaid appointment ids which are 30 min old
-const appointmenIdsToCancel = UnpaidAppointments.map(appointment => appointment.id)
- await prisma.$transaction(async(tx)=>{
-  await tx.payment.deleteMany({
-    where:{
-      appointmentId : {
-        in:appointmenIdsToCancel
-      }
-    }
-  })
-  await tx.appointment.deleteMany({
-    where:{
-      id: {
-        in:appointmenIdsToCancel
-      }
-    }
-  })
+      if(UnpaidAppointments.length > 0){
+      const appointmentIdsToCancel = UnpaidAppointments?.map(
+          (appointment) => appointment.id
+      );
+      console.log(appointmentIdsToCancel,"appointment should cancel")
+      await prisma.$transaction(async (tx) => {
+        await tx.payment.deleteMany({
+            where: {
+                appointmentId: { in: appointmentIdsToCancel },
+            },
+        });
 
-  for(const UnpaidAppointment of UnpaidAppointments){
-    await tx.doctorSchedules.updateMany({
-      where:{
-       doctorId : UnpaidAppointment.doctorId,
-       scheduleId : UnpaidAppointment.scheduleId
-      },
-      data: {
-        isBooked : false
-      }
-    })
-  }
+        await tx.appointment.deleteMany({
+            where: {
+                id: { in: appointmentIdsToCancel },
+            },
+        });
 
-})
-}
+        for (const UnpaidAppointment of UnpaidAppointments) {
+            await tx.doctorSchedules.updateMany({
+                where: {
+                    doctorId: UnpaidAppointment.doctorId,
+                    scheduleId: UnpaidAppointment.scheduleId,
+                },
+                data: { isBooked: false },
+            });
+        }
+    });
+    }
+  } catch (error) {
+      console.error("Error canceling unpaid appointments: ", error);
+      throw new AppError(
+          httpStatus.INTERNAL_SERVER_ERROR,
+          "Failed to cancel unpaid appointments"
+      );
+  }
+};
+
 export const AppointmentService = {
   createAppointmentIntoDB,
   getMyAppointmentFromDB,

@@ -184,6 +184,7 @@ const changeProfileStatus = async (id: string, status: UserRole) => {
 };
 
 const getMyProfileFromDB = async (user: TAuthUser) => {
+ 
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
       email: user?.email,
@@ -197,6 +198,7 @@ const getMyProfileFromDB = async (user: TAuthUser) => {
       status: true,
     },
   });
+  console.log(userInfo)
   let profileInfo;
   if (userInfo?.role === UserRole.SUPER_ADMIN) {
     profileInfo = await prisma.admin.findUniqueOrThrow({
@@ -234,6 +236,7 @@ const getMyProfileFromDB = async (user: TAuthUser) => {
 };
 
 const updateMyProfileIntoDB = async (user: TAuthUser, req: Request) => {
+  
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
       email: user?.email,

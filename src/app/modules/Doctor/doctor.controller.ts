@@ -62,6 +62,7 @@ const getDoctorStatistics = catchAsync(async (req: Request, res: Response) => {
       startDate: startDate ? new Date(startDate as string) : undefined,
       endDate: endDate ? new Date(endDate as string) : undefined,
     };
+   
   
     const result = await DoctorService.getDoctorStatistics(doctorId, filter);
   

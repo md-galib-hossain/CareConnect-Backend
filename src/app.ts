@@ -17,13 +17,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //check each miniutes if any appointment is not paid in less or equal than 30 mins then deleete that appointment
-cron.schedule("* * * * *", () => {
-  try {
-    AppointmentService.cancelUnpaidAppointments();
-  } catch (err) {
-    console.log(err);
-  }
-});
+// cron.schedule("* * * * *", () => {
+//   try {
+//     AppointmentService.cancelUnpaidAppointments();
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
+
+
 app.get("/", (req: Request, res: Response) => {
   res.send({
     message: "Hello",

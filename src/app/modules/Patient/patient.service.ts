@@ -88,6 +88,8 @@ const getByPatientIdFromDB = async (id: string): Promise<Patient | null> => {
 
 const updatePatientIntoDB = async (id: string, payload: Partial<TPatientUpdate>) : Promise<Patient | null> => {
   const { patientHealthData, medicalReport, ...patientData } = payload;
+  console.log(id)
+  console.log(payload)
   const patientInfo = await prisma.patient.findUniqueOrThrow({
     where: {
       id,
@@ -193,6 +195,8 @@ const softDeletePatientUserFromDB = async (id: string): Promise<Patient | null> 
     return deletedPatient;
   });
 };
+
+
 
 export const PatientService = {
   getAllPatientFromDB,

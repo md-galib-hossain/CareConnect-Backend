@@ -93,6 +93,7 @@ const getAllDoctorsFromDB = async (
 };
 
 const getDoctorByIdFromDB = async (id: string): Promise<Doctor | null> => {
+
   const result = await prisma.doctor.findUnique({
     where: {
       id,
@@ -108,6 +109,8 @@ const getDoctorByIdFromDB = async (id: string): Promise<Doctor | null> => {
       review: true,
     },
   });
+ 
+
   return result;
 };
 
@@ -328,6 +331,7 @@ const getDoctorStatistics = async (
       _all: true,
     },
   });
+  console.log(reviewCountsByRating)
 
   // Group reviews by rating categories
   const reviewCountsByCategory = {
